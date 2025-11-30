@@ -12,8 +12,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float jumpForce = 7f;
 
     private Rigidbody2D rb;
-    private float moveInput; // �¿� �Է°� ����
-    private bool isGrounded = false; // �� üũ��
+    private float moveInput; 
+    private bool isGrounded = false; 
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
     public float HP;
     public float Damage;
     public bool IsDaed;
+    public Animator anim;
 
 
     private void Awake()
@@ -32,29 +33,38 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // �¿� �̵�
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-
-        // ���� ��� �ִ��� Ȯ��
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         Debug.Log(isGrounded);
-    }
+		anim.SetBool("Walk", Mathf.Abs(rb.linearVelocity.x) > 0.01f || Mathf.Abs(rb.linearVelocity.y) > 0.01f);
+
+		// --- 공격 ---
+		if (Input.GetKeyDown(KeyCode.Mouse0))
+			anim.SetTrigger("Attack");
+
+		// --- 패링 ---
+		if (Input.GetKeyDown(KeyCode.Mouse1))
+			anim.SetTrigger("Parry");
+	}
 
 
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
         Vector2 move = ctx.ReadValue<Vector2>();
-        moveInput = move.x; // �¿츸
+        moveInput = move.x; 
     }
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
+        Debug.Log(isGrounded);
         if (ctx.performed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             Debug.Log("Jump!");
         }
     }
+
+
 }
